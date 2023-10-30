@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block body %}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Galería de Imágenes</title>
+</head>
+<body>
+    
+    <div class="card text-center">
+        <h1>Galería de Imágenes</h1>
+        <div class="card card-body">
+        <form action="/ejecutar_tarea" method="post">
+        <div class="form-group">
+            <button type="submit" class="btn btn-dark btn-validar btn-block">
+                Actualizar datos
+            </button>
+            </div>
+        </form>
+        <div class="imagen-container">
+            {% for imagen in imagenes %}
+            <a href="/caras_reconocidas/{{imagen.1}}" >
+            <img src="data:image/jpeg;base64,{{ imagen.0}}" >
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    </div>
+
+</body>
+</html>
+
+{% endblock %}
+
+
+
+
+
