@@ -127,6 +127,14 @@ def get_face_db():
     cur.close() 
     return admin
 
+def get_file_db():
+    connection = connect_db()
+    with connection.cursor() as cur:
+        cur.execute("SELECT FileID FROM facelacs.`facedata` ;")
+        admin = cur.fetchall()
+    cur.close() 
+    return admin
+
 def get_photo_db():
     connection = connect_db()
     with connection.cursor() as cur:

@@ -9,7 +9,6 @@ GRAPH_API_ENDPOINT = 'https://graph.microsoft.com/v1.0'
 def generate_access_token(app_id, scopes):
     # Save Session Token as a token file
     access_token_cache = msal.SerializableTokenCache()
-    
 
     # read the token file
     if os.path.exists('ms_graph_api_token.json'):
@@ -33,7 +32,7 @@ def generate_access_token(app_id, scopes):
         # flow = client.initiate_device_flow(scopes=scopes)
         # print('user_code: ' + flow['user_code'])
         # webbrowser.open('https://microsoft.com/devicelogin')
-        token_response = client.acquire_token_interactive(scopes)
+        token_response =client.acquire_token_interactive(scopes=scopes)
 
     with open('ms_graph_api_token.json', 'w') as _f:
         _f.write(access_token_cache.serialize())

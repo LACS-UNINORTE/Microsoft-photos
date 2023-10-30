@@ -3,27 +3,28 @@ from flask_httpauth import HTTPBasicAuth
 import flask_excel as excel
 from flask_cors import CORS
 from flask_paginate import Pagination #Importando paquete de paginación
-from ms_graph import generate_access_token, GRAPH_API_ENDPOINT
+
 
 #Importaciones de modulos
+from ms_graph import generate_access_token, GRAPH_API_ENDPOINT
 from services.config import DevelopmentConfig
 from repository.SQL_query import *
 from controllers.Home import *
 from controllers.Admin import *
 import pickle
-
-
+import requests
 import threading 
 import subprocess
-import requests
 import concurrent.futures
+from datetime import datetime
+import os
+
 import numpy as np
-import cv2
 import base64
-import io
 
 from PIL import Image
 from io import BytesIO
+import io
 
 # initializations
 app = Flask(__name__, template_folder='../front/templates', static_folder='../front/static')
@@ -112,65 +113,85 @@ def Caras_reconocidas():
     return render_template('galeria.html', imagenes=faces)
 
 @app.route('/ejecutar_tarea', methods=['POST'])
+@auth.login_required
 def ejecutar_tarea():
     if request.method == 'POST':
         # Cuando se presione el botón, crea un nuevo hilo y ejecuta la tarea
+        path=os.getcwd()
+        print(path)
         thread = threading.Thread(target=ejecutar_clasificacion)
         thread.start()
     return redirect(url_for('Caras_reconocidas'))
 
 
 
-@app.route('/caras_reconocidas/<id>',methods=['POST', 'GET'])
+@app.route('/caras_reconocidas/<id>',methods=['GET'])
+@auth.login_required
 def show_related_photos(id):
-
-   
-    APP_ID = '69b42475-11c2-4a72-8f2d-54796e1da8f6'
-    SCOPES = ['Files.Read'] 
-    access_token = generate_access_token(APP_ID, scopes=SCOPES)
-    headers = {'Authorization': 'Bearer ' + access_token['access_token']}
     count =  get_rp_count_db(id)
+    app_id = '69b42475-11c2-4a72-8f2d-54796e1da8f6'
+    scopes = ['Files.Read']
+    
+    access_token = generate_access_token(app_id, scopes=scopes)
+    headers = {'Authorization': 'Bearer ' + access_token['access_token']}
+    thumbnail_urls = []
     page_num = request.args.get('page', 1, type=int)
-    per_page = 6
+    per_page = 20
+
     start_index = (page_num - 1) * per_page + 1
+  
     resultados = get_related_photo_db(id,per_page,start_index - 1)
     file_ids = [fila[0] for fila in resultados]
-    thumbnail_urls = []
-    # Utiliza concurrent.futures para obtener las URLs de los thumbnails en paralelo
+    size = "large"
+    
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        # Mapea la función get_thumbnail_url a cada ID de archivo en paralelo
-        thumbnail_urls = list(executor.map(lambda file_id: get_thumbnail_url(file_id, headers), file_ids))
-
+        thumbnail_urls = list(executor.map(lambda file_id: get_thumbnail_url(file_id, headers,size), file_ids))
+        
     end_index = min(start_index + per_page, count)
+
     if end_index > count:
         end_index = count
    
     pagination = Pagination(page=page_num, total=count, per_page=per_page,
                             display_msg=f"Mostrando registros {start_index} - {end_index} de un total de <strong>({count})</strong>")
 
-    arreglo_resultante = np.column_stack((thumbnail_urls, file_ids))
+    # arreglo_resultante ={
+    # 'urls':thumbnail_urls, 
+    # 'file_ids':file_ids
+    # }
+    # resultados = list(zip(arreglo_resultante['urls'], arreglo_resultante['file_ids']))
 
-    
-    return render_template('galeria_id.html', id=id,resultados=arreglo_resultante , pagination=pagination)
+    arreglo_resultante = np.column_stack(( thumbnail_urls,file_ids))
+
+
+
+    return render_template('galeria_id.html',id=id,resultados= arreglo_resultante, pagination=pagination)
 
 @app.route('/caras_reconocidas/<int:caras_id>/photos/<foto_id>')
+@auth.login_required
 def mostrar_fotos(caras_id, foto_id):
-    APP_ID = '69b42475-11c2-4a72-8f2d-54796e1da8f6'
-    SCOPES = ['Files.Read'] 
-    access_token = generate_access_token(APP_ID, scopes=SCOPES)
+  
+    app_id = '69b42475-11c2-4a72-8f2d-54796e1da8f6'
+    scopes = ['Files.Read']
+    
+    access_token = generate_access_token(app_id, scopes=scopes)
     headers = {'Authorization': 'Bearer ' + access_token['access_token']}
     encode_img_data = get_content_url(foto_id,headers)
+    return render_template('galeria_id_photo.html', imagen=encode_img_data.decode("UTF-8"),caras_id=caras_id)
 
-    return render_template("galeria_foto.html",url_foto=encode_img_data.decode("UTF-8"))
 
-def get_thumbnail_url(file_id,headers):
+    
 
-    url = f'https://graph.microsoft.com/v1.0/me/drive/items/{file_id}/thumbnails/0/large'
+
+def get_thumbnail_url(file_id,headers,size):
+
+    url = f'https://graph.microsoft.com/v1.0/me/drive/items/{file_id}/thumbnails/0/{size}'
     response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
         return response.json().get('url')
     else:
+        # Manejar errores adecuadamente
         return None
     
 def get_content_url(file_id,headers):
@@ -186,6 +207,7 @@ def get_content_url(file_id,headers):
         return encode_img_data
     else:
         return None
+
 
 #Despliegue de la app
 if __name__ == '__main__':

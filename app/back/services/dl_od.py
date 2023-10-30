@@ -7,22 +7,14 @@ import numpy as np
 import requests
 import imutils
 import dlib
-import sys
 import cv2
 import os
 
 
-if len(sys.argv) != 3:
-    print(
-        "Call this program like this:\n"
-        "   ./face_clustering.py shape_predictor_5_face_landmarks.dat dlib_face_recognition_resnet_model_v1.dat ../examples/faces output_folder\n"
-        "You can download a trained facial shape predictor and recognition model from:\n"
-        "    http://dlib.net/files/shape_predictor_5_face_landmarks.dat.bz2\n"
-        "    http://dlib.net/files/dlib_face_recognition_resnet_model_v1.dat.bz2")
-    exit()
 
-predictor_path = sys.argv[1]
-face_rec_model_path = sys.argv[2]
+
+predictor_path = "shape_predictor_68_face_landmarks_GTX.dat"
+face_rec_model_path = "dlib_face_recognition_resnet_model_v1.dat"
 
 
 # Load all the models we need: a detector to find the faces, a shape predictor
@@ -83,7 +75,7 @@ while True:
 					# Compute the 128D vector that describes the face in img identified by
 					# shape.  
 					face_descriptor = facerec.compute_face_descriptor(rgb, shape)
-					print(face_descriptor)
+					#print(face_descriptor)
 					descriptors.append(face_descriptor)
 					images.append((rgb, d))
 
@@ -98,7 +90,7 @@ while True:
 
 
 
-labels = dlib.chinese_whispers_clustering(descriptors, 0.5)
+labels = dlib.chinese_whispers_clustering(descriptors, 0.48)
 #num_classes = len(set(labels))
 #print("Number of clusters: {}".format(num_classes))
 labelIDs = np.unique(labels)

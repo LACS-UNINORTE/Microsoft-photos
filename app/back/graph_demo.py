@@ -1,24 +1,21 @@
 import json
 
 import requests
-from msal import ConfidentialClientApplication
-
-# client_id = "61afd86f-3c9f-4a5e-91b8-e00c71e9d9ec"
-# client_secret ="gkS8Q~PiXgyZIKr-hz_vtjREooyGbP1F4g3lYcf0"
-# tenant_id = "58f8d266-6165-48bb-afad-4f8e51286b57"
-
+import msal
 client_id = "9753e1da-5aea-4636-afae-82d14f94cb39"
-client_secret ="UjJ8Q~bJIfTeySmkF8yAjtnPjG101A9MJs-Sgdyy"
+client_secret ="R3C8Q~JD3.IQUw4ySDhcRKb_w.cxn8akA-XGhcUo"
 tenant_id = "58f8d266-6165-48bb-afad-4f8e51286b57"
 
-msal_authority = f"https://login.microsoftonline.com/{tenant_id}"
+#msal_authority = f"https://login.microsoftonline.com/{tenant_id}"
+
+msal_authority = f"https://login.microsoftonline.com/common"
 
 msal_scope = ["https://graph.microsoft.com/.default"]
 
-msal_app = ConfidentialClientApplication(
+msal_app = msal.ConfidentialClientApplication(
     client_id=client_id,
-    client_credential=client_secret,
     authority=msal_authority,
+    client_credential=client_secret
 )
 
 result = msal_app.acquire_token_silent(
@@ -39,10 +36,11 @@ headers = {
     "Content-Type": "application/json",
 }
 
-file_ids = f"https://onedrive.live.com/?id=root&cid=128F10A92846F712"
+file_ids = '128F10A92846F712%21106'
+user_id="84f7287e-6431-4ded-bbf2-717397fbd45c"
 
 response = requests.get(
-    url= f"https://graph.microsoft.com/v1.0/users/84f7287e-6431-4ded-bbf2-717397fbd45c/drives/128f10a92846f712",
+    url=f"https://graph.microsoft.com/v1.0/drives/{user_id}/items/{file_ids}/children/?select=name,id",
     headers=headers,
 )
 
