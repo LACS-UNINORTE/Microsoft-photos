@@ -1,0 +1,34 @@
+
+
+.image-zoom-container {
+  width: 100%;
+  overflow: hidden;
+}
+
+#zoom {
+  width: 100%;
+  height: auto;
+  transform-origin: 0px 0px;
+  transform: scale(1) translate(0px, 0px);
+  cursor: grab;
+  overflow-x: auto; 
+  
+}
+div#zoom > img {
+  width: 100%;
+  height: auto;
+
+}
+
+.zoom-content {
+  position: relative;
+  width: 100%
+}
+
+.rectangle {
+position: absolute;
+border: 2px solid #00ff00; /* Color verde para el borde */
+display: none; /* Ocultar por defecto */
+}
+
+  

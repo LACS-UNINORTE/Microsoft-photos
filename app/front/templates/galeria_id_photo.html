@@ -1,0 +1,248 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<style>
+
+  
+  .contenedor {
+  position: relative;
+  width:  100%; /* Ajusta el ancho deseado de la imagen */
+  }
+  .imagen {
+      border: 1px solid #ddd; /* Gray border */
+      border-radius: 4px;  /* Rounded border */
+      padding: 5px; /* Some padding */
+      width:  auto; /* Set a small width */
+  }
+  .imagen:hover {
+  box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
+  }
+  /* Add a hover effect (blue shadow) */
+
+  .texto-superior {
+      color: #f2f2f2; /* Color del texto */
+      font-size: 15px;
+      font-weight: bolder;
+      padding: 8px 12px;
+      position: absolute;
+      bottom: 8px;
+      left: 0; /* En lugar de width: 100% */
+      right: 0;
+      text-align: center;
+      white-space: nowrap;
+  }
+ 
+
+
+
+  
+  
+  </style>
+ 
+<link rel="stylesheet" href="{{ url_for('static', filename ='css/style.css') }}" />
+
+<div class="container">
+<div class="row">
+      
+  <div class="col-md-8">
+    <div class="card card-body">
+      <div class="image-container">
+               
+    
+      <div class="image-zoom-container" id="image-container">
+        <div id="zoom"> 
+       
+          <!-- data:image/jpeg;base64,{{ imagen }} -->
+          <!-- {{ url_for('static', filename ='img/Toyota_Robot_at_Toyota_Kaikan.jpg') }} -->
+          <img  id="imagenOriginal" src=" data:image/jpeg;base64,{{ imagen }}"  alt="Imagen"  >
+            <!-- <img  id="imagenOriginal" src="{{ imagen }}"  alt="Thumbnail"  > -->
+
+            {% for rect in rectangles %}
+            <div  id="{{ loop.index }}" class="rectangle" 
+            style=
+                  "left: {{ rect.x  }}px; 
+                    top: {{ rect.y  }}px; 
+                  width: {{ rect.w  }}px; 
+                 height: {{ rect.h  }}px;">
+            </div>
+            {% endfor %}
+         
+        </div>
+      </div> 
+
+        
+        </div> 
+      </div>
+    </div>
+     
+    <div class="col-md-4">
+      <div class="card card-body">
+        <div class="portfolio-item row justify-content-md-center">
+         
+          {% for face in faces %} 
+          <div class=" col-mx-auto">
+              <div class="contenedor" onmouseover="showRectangle('{{ loop.index }}')" onmouseout="hideRectangle('{{ loop.index }}')">
+              <a href="/busqueda/{{face.1}}" >
+              <img class="imagen" src="data:image/jpeg;base64,{{ face.0}}" width="150" height="150" alt="Imagen">
+              </a>
+              {% if face.2 %}
+                <div class="texto-superior">
+                  {{ face.2 }}
+                  </div>
+              {% endif %} 
+            </div>
+            </div>
+            
+       
+          {% endfor %}
+         
+        </div>
+      </div>
+    </div>
+  
+     
+
+  </div> 
+
+</div>
+
+      <script>
+var scale = 1,
+    panning = false,
+    pointX = 0,
+    pointY = 0,
+    start = { x: 0, y: 0 },
+    zoom = document.getElementById("zoom"),
+    container = document.querySelector(".image-zoom-container"); // Get the container element
+
+const minScale = 1.0; // Set the minimum scale limit here
+
+function setTransform() {
+    zoom.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+}
+
+zoom.onmousedown = function (e) {
+    e.preventDefault();
+    start = { x: e.clientX - pointX, y: e.clientY - pointY };
+    panning = true;
+}
+
+zoom.onmouseup = function (e) {
+    panning = false;
+}
+
+zoom.onmousemove = function (e) {
+    e.preventDefault();
+    if (!panning) {
+        return;
+    }
+    pointX = e.clientX - start.x;
+    pointY = e.clientY - start.y;
+    limitPanning();
+    setTransform();
+}
+
+zoom.onwheel = function (e) {
+    e.preventDefault();
+    var xs = (e.clientX - pointX) / scale,
+        ys = (e.clientY - pointY) / scale,
+        delta = (e.wheelDelta ? e.wheelDelta : -e.deltaY);
+
+    // If zoom is going to be smaller than the normal size, reset scale and position
+    if (delta < 0 && scale / 1.2 <= minScale) {
+        scale = 1;
+        pointX = 0;
+        pointY = 0;
+    } else {
+        if (delta > 0) {
+            scale *= 1.2;
+        } else {
+            // Check that it doesn't go below the minimum limit
+            if (scale / 1.2 >= minScale) {
+                scale /= 1.2;
+            }
+        }
+    }
+
+    pointX = e.clientX - xs * scale;
+    pointY = e.clientY - ys * scale;
+    limitPanning();
+    setTransform();
+}
+
+function limitPanning() {
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    const imageWidth = zoom.offsetWidth * scale;
+    const imageHeight = zoom.offsetHeight * scale;
+
+    // Limit the panning to the edges of the image within the container
+    pointX = Math.min(0, Math.max(pointX, containerWidth - imageWidth));
+    pointY = Math.min(0, Math.max(pointY, containerHeight - imageHeight));
+}
+
+
+      </script>
+
+
+<script>
+        function showRectangle(rectangleId) {
+            var rectangle = document.getElementById(rectangleId);
+            if (rectangle) {
+                rectangle.style.display = 'block';
+            }
+        }
+
+        function hideRectangle(rectangleId) {
+            var rectangle = document.getElementById(rectangleId);
+            if (rectangle) {
+                rectangle.style.display = 'none';
+            }
+        }
+</script>
+
+
+<script>
+
+
+
+  function ajustarCaras() {
+
+    var imagen = document.getElementById('imagenOriginal');
+
+// Obtener el tamaño original de la imagen
+      var originalWidth = imagen.naturalWidth;
+      var originalHeight = imagen.naturalHeight;
+
+  
+      // Obtener las dimensiones del contenedor
+      var container = document.getElementById('image-container');
+      var containerWidth = container.offsetWidth;
+      var containerHeight = container.offsetHeight;
+  
+      // Calcular el factor de escala
+      var scaleX = originalWidth / containerWidth;
+      var scaleY = originalHeight / containerHeight;
+  
+      // Ajustar las coordenadas de las caras
+      var caras = document.getElementsByClassName('rectangle');
+      for (var i = 0; i < caras.length; i++) {
+          var cara = caras[i].style;
+          cara.left = (parseFloat(cara.left) / scaleX) + 'px';
+          cara.top = (parseFloat(cara.top) / scaleY) + 'px';
+          cara.width = (parseFloat(cara.width) / scaleX) + 'px';
+          cara.height = (parseFloat(cara.height) / scaleY) + 'px';
+      }
+  }
+  ajustarCaras();
+
+  
+  </script>
+
+
+      <!-- <script src="{{url_for('static', filename='js/zoom.js')}}"></script> -->
+
+
+
+
+{% endblock %}

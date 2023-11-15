@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% block body %}
+
+
+  <style>
+    img {
+      border: 1px solid #ddd; /* Gray border */
+      border-radius: 4px;  /* Rounded border */
+      padding: 5px; /* Some padding */
+      width:  auto; /* Set a small width */
+    }
+    
+    /* Add a hover effect (blue shadow) */
+    img:hover {
+      box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
+    }
+    .avatar {
+      vertical-align: middle;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+    }
+    .texto-superior {
+            color: #000000; /* Color del texto */
+            font-size: 20px;
+            font-weight: bolder;
+
+        }
+    .contenedor {
+    display: flex; /* Opción: usa flexbox para alinear elementos */
+    align-items: center; /* Para alinear verticalmente */
+    }
+    
+    </style>
+
+
+      <div class="container">
+      <hr>
+        <div class="row">
+         
+           <div class=" col-sm-1 ">
+            {% for foto in foto_cara %}
+            <img  src="data:image/jpeg;base64,{{ foto.0 }}" alt="Avatar" class="avatar">
+          </div>
+
+          <div class="col-sm-6 ">
+            {% if foto.1 %}
+            <div class="texto-superior">
+               {{foto.1}}
+            </div>
+                 
+            {% endif %} 
+            <form class="form-inline my-2 my-lg-0" action="{{ url_for('agregar_nombre_cara', id=id) }}" method="POST">
+                <input type="search" class="form-control mr-sm-2" name="name" placeholder="Nuevo nombre o apodo" >
+               <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Agrega un nombre</button>
+              </form> 
+
+            {% endfor %}
+          </div>
+     
+        </div>
+        <hr>
+
+        <div class="portfolio-item row">
+          {% for result in resultados %}
+           <div class=" col-lg-3 col-md-4 col-sm-6 ">
+               <a  href="{{ url_for('mostrar_fotos', caras_id=id, foto_id=result.1) }}" class="fancylight popup-btn" data-fancybox-group="light">  
+               <img class="img-fluid"  width="200" height="200" src="{{ result.0 }}" alt="Thumbnail"> 
+               </a> 
+              
+           </div>
+           {% endfor %}
+        </div>
+
+      </div>
+
+
+      <div class="row justify-content-md-center">
+        <div class="col-md-auto">
+          <span>
+            {{ pagination.info }}
+            <hr />
+          </span>
+          {{ pagination.links }}
+        </div>
+      </div>
+    
+
+{% endblock %}

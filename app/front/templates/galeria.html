@@ -1,0 +1,80 @@
+{% extends "layout.html" %}
+{% block body %}
+
+    
+    <style>
+        .contenedor {
+        position: relative;
+        width:  100%; /* Ajusta el ancho deseado de la imagen */
+        }
+        .imagen {
+            border: 1px solid #ddd; /* Gray border */
+            border-radius: 4px;  /* Rounded border */
+            padding: 5px; /* Some padding */
+            width:  auto; /* Set a small width */
+        }
+        .imagen:hover {
+        box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
+        }
+        /* Add a hover effect (blue shadow) */
+
+        .texto-superior {
+            color: #f2f2f2; /* Color del texto */
+            font-size: 15px;
+            font-weight: bolder;
+            padding: 8px 12px;
+            position: absolute;
+            bottom: 8px;
+            left: 0; /* En lugar de width: 100% */
+            right: 0;
+            text-align: center;
+            white-space: nowrap;
+        }
+        </style>
+
+    <div class="card text-center">
+        <h1>Galería de Imágenes</h1>
+        <div class="card card-body">
+            
+        <form action="/ejecutar_tarea" method="post">
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-validar btn-block">
+                Actualizar datos
+            </button>
+            </div>
+        </form>
+
+        <div class="portfolio-item row">
+        {% for imagen in imagenes %}
+        <div class="row">
+        <div class=" col-lg-3 col-md-4 col-sm-6">
+        <div class="contenedor">
+            <a href="/busqueda/{{imagen.1}}" >
+            <img class="imagen" src="data:image/jpeg;base64,{{ imagen.0}}" alt="Imagen">
+            
+            </a>
+            {% if imagen.2 %}
+           
+            <div class="texto-superior">
+                {{ imagen.2 }}
+            </div>
+          
+            {% endif %} 
+        </div> 
+        </div>
+    </div>
+        {% endfor %}
+    </div>
+
+    </div>
+    </div>
+
+    <iframe src="https://onedrive.live.com/embed?resid=128F10A92846F712%21106&authkey=!AFK_sUfI7k5SvM8" width="98" height="120" frameborder="0" scrolling="no"></iframe>
+
+
+{% endblock %}
+
+
+
+
+

@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="row">
+  
+  <div class="col-md-4">
+    <div class="card card-body">
+      <form action="{{url_for('Add_admin')}}" method="POST">
+        <div class="form-group">
+          <input type="text" class="form-control" name="_id" placeholder="Código Uninorte" required>
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-control" name="name" placeholder="Nombre" required>
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-control" name="user" placeholder="Ususario" required>
+        </div>
+        <div class="form-group">
+          <input type="email" class="form-control" name="email" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+          <input type="password" class="form-control" name="password" placeholder="Password" required>
+        </div>
+        <button class="btn btn-primary btn-block">
+          Añadir nuevo administrador
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-mx-auto">
+    <div class="card card-body">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <td>Código Uninorte</td>
+            <td>Nombre</td>
+            <td>Usuario</td>
+            <td>Operaciones</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for admin in admins %}
+          <tr>
+            <td>{{admin.0}}</td>
+            <td>{{admin.1}}</td>
+            <td>{{admin.3}}</td>
+            <td>
+              <a href="/edit_admin/{{admin.0}}" class="btn btn-secondary">Editar</a>
+              <a href="/delete_admin/{{admin.0}}" class="btn btn-danger btn-delete">Borrar</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
