@@ -1,0 +1,19 @@
+# pip install -r requirements.txt
+flask
+flask-httpauth
+flask-mysql
+Flask-Excel
+pyexcel-xlsx
+Flask-Mail
+flask-cors
+fpdf
+pymysql
+python-dotenv
+python-decouple
+cryptography
+msal
+dlib
+opencv-contrib-python
+imutils
+Pillow
+requirements
